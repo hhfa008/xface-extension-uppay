@@ -51,7 +51,6 @@ var uppay = {
         UPPay.startPay(this.uppaySuccess, this.uppayError, '201305151722540071282', '01', null, null);
      * @method startPay
      * @param {Function} successCallback 成功回调函数
-     * @param {String} successCallback.info 值为"success"
      * @param {Function} errorCallback 失败回调函数
      * @param {String} transSerialNumber 交易流水号信息，银联后台生成，通过商户后台返回到客户端并传入支付控件
      * @param {String} mode 接入模式，取值说明<br/>
