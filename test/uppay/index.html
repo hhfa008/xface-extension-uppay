@@ -1,0 +1,117 @@
+<!--
+
+ Licensed to the Apache Software Foundation (ASF) under one
+ or more contributor license agreements.  See the NOTICE file
+ distributed with this work for additional information
+ regarding copyright ownership.  The ASF licenses this file
+ to you under the Apache License, Version 2.0 (the
+ "License"); you may not use this file except in compliance
+ with the License.  You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing,
+ software distributed under the License is distributed on an
+ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ KIND, either express or implied.  See the License for the
+ specific language governing permissions and limitations
+ under the License.
+
+-->
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width,height=device-height,user-scalable=no,maximum-scale=1.0,initial-scale=1.0" />
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8"> <!-- ISO-8859-1 -->
+    <title>xFace Mobile Spec</title>
+    <link rel="stylesheet" href="../master.css" type="text/css" media="screen" title="no title" charset="utf-8">
+    <script type="text/javascript" charset="utf-8" src="../base.js"></script>
+
+
+<script type="text/javascript" charset="utf-8">
+
+    var tn = null;
+    /**
+     * Function called when page has finished loading.
+     */
+    function init() {
+        document.addEventListener("deviceready", onDeviceReady, false);
+        window.setTimeout(function() {
+            if (!deviceReady) {
+                alert("Error: xFace did not initialize.  Demo will not run correctly.");
+            }
+        },1000);
+    }
+
+    // xFace is ready
+    function onDeviceReady() {
+        deviceReady = true;
+        console.log("Device="+device.platform+" "+device.version);
+    }
+
+    function testPay() {
+        var request = new XMLHttpRequest();
+        request.onreadystatechange = function()
+        {
+            if(request.readyState == 4)
+            {
+                if(request.status == 200)
+                {
+                    tn = request.responseText;
+                    startPay();
+                }
+                else
+                {
+                    updateStatus("get transaction serial number failed! ");
+                }
+            }
+        }
+        request.open("GET", "http://222.66.233.198:8080/sim/gettn", true);
+        request.send();
+    }
+
+    function updateStatus(status) {
+        document.getElementById('status').innerText = status;
+    }
+
+    function updateProcess(process) {
+        document.getElementById('process').innerText = process;
+    }
+
+    function startPay(){
+        updateProcess("startPaying");
+        UPPay.startPay(paySuccess, payFail, tn, "01", null, null);
+    }
+
+    function paySuccess() {
+       updateStatus("pay succeeded");
+       updateProcess("test over");
+    }
+
+    function payFail(error) {
+        updateStatus("pay failed [" + error + "]");
+        updateProcess("test over");
+    }
+</script>
+
+  </head>
+  <body onload="init();" id="stage" class="theme">
+
+    <h1>UPPay </h1>
+    <div id="descr">
+        测试说明: <br/>
+        测试目的：测试银联支付控件<br/>
+        测试通过条件：银联支付控件正常启动，交易结束后正常显示交易结果<br/>
+        注意：测试前请确认android手机已安装银联支付控件,安装包可在test/uppay/目录下获取到<br/>
+    </div>
+    <div id="info">
+        process: <span id="process"></span><br/>
+        status: <span id="status"></span><br/>
+    </div>
+    <h2>Action</h2>
+    <div class="btn large" onclick="testPay();">startPay</div>
+    <h2> </h2><div class="backBtn" onclick="backHome();">Back</div>
+  </body>
+</html>
+

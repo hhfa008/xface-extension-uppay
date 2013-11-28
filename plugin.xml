@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    id="com.polyvi.xface.extension.uppay"
+    version="1.0.0">
+    <name>UPPay</name>
+    <description>xFace UPPay Extension</description>
+    <license>GPLv3</license>
+    <keywords>cordova, xface, uppay</keywords>
+
+    <js-module src="www/UPPay.js" name="UPPay">
+        <clobbers target="UPPay" />
+    </js-module>
+
+    <!-- ios -->
+    <platform name="ios">
+        <config-file target="config.xml" parent="/*">
+            <feature name="UPPay">
+                <param name="ios-package" value="XUPPayExt"/>
+            </feature>
+        </config-file>
+
+        <header-file src="src/ios/UPPayPlugin.h" />
+        <header-file src="src/ios/UPPayPluginDelegate.h" />
+        <header-file src="src/ios/XUPPayExt.h" />
+        <source-file src="src/ios/XUPPayExt.m" />
+        <source-file framework="true" src="src/ios/libUPPayPlugin.a" />
+        <framework src="QuartzCore.framework" />
+        <framework src="libstdc++.dylib" />
+    </platform>
+</plugin>
