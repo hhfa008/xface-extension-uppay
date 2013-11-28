@@ -53,7 +53,6 @@ var uppay = {
      * @param {Function} successCallback 成功回调函数
      * @param {String} successCallback.info 值为"success"
      * @param {Function} errorCallback 失败回调函数
-     * @param {String} errorCallback.info 可能值为"fail"或者"cancel"
      * @param {String} transSerialNumber 交易流水号信息，银联后台生成，通过商户后台返回到客户端并传入支付控件
      * @param {String} mode 接入模式，取值说明<br/>
                 "00"：代表接入生产环境（正式版本需要）<br/>
@@ -76,6 +75,14 @@ var uppay = {
         sysProvide = sysProvide || null;
         spId = spId || null;
         exec(successCallback, errorCallback, "UPPay", "startPay", [transSerialNumber, mode, sysProvide, spId]);
+    },
+    /**
+    * 返回交易结果回调 (Android, iOS)
+    * 该方法在交易结束后被调用，如果app覆盖该函数，则执行app定义的回调，否则什么都不做。
+    * @method startPay
+    * @param result{String}          返回的交易结果：success，fail 或 cancel
+    */
+    onPayResult : function (result) {
     }
 };
 module.exports = uppay;
