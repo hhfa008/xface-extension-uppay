@@ -82,15 +82,20 @@
     function startPay(){
         updateProcess("startPaying");
         UPPay.startPay(paySuccess, payFail, tn, "01", null, null);
+        UPPay.onPayResult = function(result)
+        {
+            updateStatus("pay succeeded");
+            updateProcess("test over");
+        }
     }
 
     function paySuccess() {
-       updateStatus("pay succeeded");
-       updateProcess("test over");
+       updateStatus("startPay succeeded");
+       updateProcess("waiting for pay result");
     }
 
     function payFail(error) {
-        updateStatus("pay failed [" + error + "]");
+        updateStatus("startPay failed [" + error + "]");
         updateProcess("test over");
     }
 </script>

@@ -39,15 +39,6 @@
 // result may be "success", "fail" or "cancel"
 - (void)UPPayPluginResult:(NSString*)result
 {
-    CDVCommandStatus status = CDVCommandStatus_NO_RESULT;
-    if([result isEqualToString:@"success"])
-    {
-        status = CDVCommandStatus_OK;
-    }
-    else
-    {
-        status = CDVCommandStatus_ERROR;
-    }
 
     if(SYSTEM_VERSION_NOT_LOWER_THAN(@"7.0"))
     {
@@ -55,8 +46,8 @@
         [[UIApplication sharedApplication] setStatusBarHidden:self.statusBarHidden];
     }
 
-    CDVPluginResult *extResult = [CDVPluginResult resultWithStatus:status messageAsString:result];
-    [self.uppayExt.commandDelegate sendPluginResult:extResult callbackId:_callbackId];
+    NSString* jsScript = [NSString stringWithFormat:@"UPPay.onPayResult('%@');", result];
+    [self.uppayExt.commandDelegate evalJs:jsScript];
     [self.uppayExt removeUPPayDelegate:self];
     self.uppayExt = nil;
 }
@@ -95,15 +86,18 @@
     [uppayDelegates addObject:delegate];
     delegate.uppayExt = self;
 
+    BOOL ret;
     if([UPPayPlugin respondsToSelector:@selector(startPay:sysProvide:spId:mode:viewController:delegate:)])
     {
-        [UPPayPlugin startPay:transSerialNumber sysProvide:sysProvide spId:spId mode:mode viewController:[self viewController] delegate:delegate];
+       ret = [UPPayPlugin startPay:transSerialNumber sysProvide:sysProvide spId:spId mode:mode viewController:[self viewController] delegate:delegate];
     }
     else
     {
-        [UPPayPlugin startPay:transSerialNumber mode:mode viewController:[self viewController] delegate:delegate];
+       ret = [UPPayPlugin startPay:transSerialNumber mode:mode viewController:[self viewController] delegate:delegate];
     }
-
+    CDVCommandStatus status = ret ? CDVCommandStatus_OK : CDVCommandStatus_ERROR;
+    CDVPluginResult* result = [CDVPluginResult resultWithStatus:status];
+    [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
 }
 
 - (void) removeUPPayDelegate:(XUPPayDelegate *)delegate
