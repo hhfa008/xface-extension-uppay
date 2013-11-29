@@ -29,4 +29,22 @@
         <framework src="QuartzCore.framework" />
         <framework src="libstdc++.dylib" />
     </platform>
+
+    <!-- android -->
+    <platform name="android">
+        <config-file target="config.xml" parent="/*">
+            <feature name="UPPay">
+                <param name="android-package" value="com.polyvi.xface.extension.uppay.XUPPayExt"/>
+            </feature>
+        </config-file>
+
+        <config-file target="res/xml/xface_string.xml" parent="/*">
+            <string name="uppay_install_warn">银联安全支付控件未被正确安装，检查并重新安装？</string>
+            <string name="pay_plugin_install_options">确定,取消</string>
+        </config-file>
+
+        <source-file src="src/android/XUPPayExt.java" target-dir="src/com/polyvi/xface/extension/uppay"/>
+        <source-file src="src/android/UPPayPluginEx.apk" target-dir="assets/"/>
+        <source-file src="src/android/UPPayAssistEx.jar" target-dir="libs/"/>
+    </platform>
 </plugin>
