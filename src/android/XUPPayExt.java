@@ -46,6 +46,8 @@ public class XUPPayExt extends CordovaPlugin {
 
     private static final String KEY_PAY_RESULT = "pay_result";
     private static final String PAY_RESULT_SUCCESS = "success";
+    private static String UPPAY_INSTALL_WARN = "uppay_install_warn";
+    private static String PAY_PLUGIN_INSTALL_OPTIONS = "pay_plugin_install_options";
 
     private static final String COMMAND_START_PAY = "startPay";
 
@@ -103,10 +105,10 @@ public class XUPPayExt extends CordovaPlugin {
         };
         XNotification alert = new XNotification(cordova);
         alert.confirm(
-                XStrings.getInstance().getString(XStrings.UPPAY_INSTALL_WARN),
+                XStrings.getInstance().getString(UPPAY_INSTALL_WARN),
                 "",
                 XStrings.getInstance().getString(
-                        XStrings.PAY_PLUGIN_INSTALL_OPTIONS), clickedOk, null,
+                        PAY_PLUGIN_INSTALL_OPTIONS), clickedOk, null,
                 null);
     }
 
