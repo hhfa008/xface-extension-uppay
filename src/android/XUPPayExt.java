@@ -30,24 +30,42 @@ import org.apache.cordova.PluginResult.Status;
 import org.json.JSONArray;
 import org.json.JSONException;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 
-import com.polyvi.xface.util.XNotification;
-import com.polyvi.xface.util.XStrings;
 import com.unionpay.UPPayAssistEx;
+import com.unionpay.uppay.PayActivity;
 
 /**
  * XUPPayExt主要是封装启动银联支付控件的接口和接收交易结束后控件返回的交易结果<br/>
- * dependent-libs: UPPayAssistEx.jar,assets/UPPayPluginEx.apk
+ * dependent-libs: UPPayAssistEx.jar,UPPayPluginEx.jar,armeabi/libentryex.so
  */
 public class XUPPayExt extends CordovaPlugin {
+    /**
+     * 1.该扩展需要在AndroidManifest.xml配置<activity>标签
+     * <activity android:name="com.unionpay.uppay.PayActivity"
+     *      android:theme="@style/Theme.UPPay"
+     *      android:label="@string/app_name"
+     *      android:screenOrientation="portrait"
+     *      android:configChanges="orientation|keyboardHidden"
+     *      android:excludeFromRecents="true" />
+     * <activity android:name="com.unionpay.uppay.PayActivityEx"
+     *      android:label="@string/app_name"
+     *      android:screenOrientation="portrait"
+     *      android:configChanges="orientation|keyboardHidden"
+     *      android:excludeFromRecents="true"
+     *      android:windowSoftInputMode="adjustResize" />
+     * 2.该扩展需要在AndroidManifest.xml配置的权限有
+     * <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+     * <uses-permission android:name="android.permission.INTERNET" />
+     * <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+     * <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+     * <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+     * <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+     * 3.在res/values中增加style.xml文件
+     */
 
     private static final String KEY_PAY_RESULT = "pay_result";
     private static final String PAY_RESULT_SUCCESS = "success";
-    private static String UPPAY_INSTALL_WARN = "uppay_install_warn";
-    private static String PAY_PLUGIN_INSTALL_OPTIONS = "pay_plugin_install_options";
 
     private static final String COMMAND_START_PAY = "startPay";
 
@@ -56,7 +74,7 @@ public class XUPPayExt extends CordovaPlugin {
     @Override
     public boolean execute(String action, JSONArray args,
             CallbackContext callbackContext) throws JSONException {
-        Status status = Status.INVALID_ACTION;
+        // 目前不支持同时进行多个支付操作
         if (COMMAND_START_PAY.equals(action)) {
             mCallbackCtx = callbackContext;
             String transSerialNumber = args.getString(0);
@@ -64,52 +82,13 @@ public class XUPPayExt extends CordovaPlugin {
             String mode = args.getString(1);
             String sysProvide = args.getString(2);
             String spId = args.getString(3);
-
-            int ret = UPPayAssistEx.startPay(cordova.getActivity(), spId,
-                    sysProvide, transSerialNumber, mode);
-            if (ret == UPPayAssistEx.PLUGIN_VALID) {
-                status = Status.NO_RESULT;
-                PluginResult r = new PluginResult(status);
-                mCallbackCtx.sendPluginResult(r);
-                return false;
-            } else if (ret == UPPayAssistEx.PLUGIN_NOT_FOUND) {
-                status = Status.ERROR;
-                PluginResult r = new PluginResult(status,
-                        "The uppay plugin apk is not installed!");
-                showInstallationDialog();
-                mCallbackCtx.sendPluginResult(r);
-                return false;
-            } else {
-                status = Status.ERROR;
-                PluginResult r = new PluginResult(status);
-                mCallbackCtx.sendPluginResult(r);
-                return false;
-            }
+            UPPayAssistEx.startPayByJAR(cordova.getActivity(),
+                    PayActivity.class, spId, sysProvide, transSerialNumber,
+                    mode);
         }
-        PluginResult r = new PluginResult(status);
+        PluginResult r = new PluginResult(Status.NO_RESULT);
         mCallbackCtx.sendPluginResult(r);
         return true;
-    }
-
-    /**
-     * 弹出一个确认对话框，提示用户安装银联支付控件插件
-     */
-    private void showInstallationDialog() {
-        DialogInterface.OnClickListener clickedOk = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                if (dialog instanceof AlertDialog) {
-                    UPPayAssistEx.installUPPayPlugin(cordova.getActivity());
-                }
-            }
-        };
-        XNotification alert = new XNotification(cordova);
-        alert.confirm(
-                XStrings.getInstance().getString(UPPAY_INSTALL_WARN),
-                "",
-                XStrings.getInstance().getString(
-                        PAY_PLUGIN_INSTALL_OPTIONS), clickedOk, null,
-                null);
     }
 
     @Override
