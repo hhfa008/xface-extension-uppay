@@ -40,7 +40,7 @@
 - (void)UPPayPluginResult:(NSString*)result
 {
 
-    if(SYSTEM_VERSION_NOT_LOWER_THAN(@"7.0"))
+    if(IsAtLeastiOSVersion(@"7.0"))
     {
         //在iOS 7.0上，还原status bar显示状态
         [[UIApplication sharedApplication] setStatusBarHidden:self.statusBarHidden];
@@ -77,7 +77,7 @@
     XUPPayDelegate *delegate = [[XUPPayDelegate alloc] initWithCallbackId:command.callbackId];
 
     delegate.statusBarHidden = [UIApplication sharedApplication].statusBarHidden;
-    if(SYSTEM_VERSION_NOT_LOWER_THAN(@"7.0"))
+    if(IsAtLeastiOSVersion(@"7.0"))
     {
         // iOS 7.0上，使用全屏方式启动支付控件，解决状态栏与支付控件内容发生重叠的问题
         [[UIApplication sharedApplication] setStatusBarHidden:YES];
