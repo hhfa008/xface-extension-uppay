@@ -21,3 +21,5 @@
 -->
 
 # Release Notes
+### 1.0.0 Tue Jan 07 2014 16:09:56 GMT+0800 (CST)
+ *  [iOS] Use IsAtLeastiOSVersion instead of SYSTEM_VERSION_NOT_LOWER_THAN
