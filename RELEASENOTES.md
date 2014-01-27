@@ -23,3 +23,7 @@
 # Release Notes
 ### 1.0.0 Tue Jan 07 2014 16:09:56 GMT+0800 (CST)
  *  [iOS] Use IsAtLeastiOSVersion instead of SYSTEM_VERSION_NOT_LOWER_THAN
+### 1.0.1 Mon Jan 27 2014 15:57:10 GMT+0800 (CST)
+ *  batch modify .reviewboard
+ *  #2: Added UIViewControllerBasedStatusBarAppearance key and false value to info.plist to hide status bar when displaying payment page.
+ *  Incremented plugin version on dev branch to 1.0.1-dev
