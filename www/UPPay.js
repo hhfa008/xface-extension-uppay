@@ -1,4 +1,3 @@
-
 /*
  Copyright 2012-2013, Polyvi Inc. (http://www.xface3.com)
  This program is distributed under the terms of the GNU General Public License.
@@ -51,7 +50,9 @@ var uppay = {
         UPPay.startPay(this.uppaySuccess, this.uppayError, '201305151722540071282', '01', null, null);
      * @method startPay
      * @param {Function} successCallback 成功回调函数
+     * @param {String} successCallback.info 值为"success"
      * @param {Function} errorCallback 失败回调函数
+     * @param {String} errorCallback.info 可能值为"fail"或者"cancel"
      * @param {String} transSerialNumber 交易流水号信息，银联后台生成，通过商户后台返回到客户端并传入支付控件
      * @param {String} mode 接入模式，取值说明<br/>
                 "00"：代表接入生产环境（正式版本需要）<br/>
@@ -59,11 +60,12 @@ var uppay = {
                 "99": 代表pm测试环境（测试版本需要）<br/>
      * @param {String} [sysProvide=null] 保留使用
      * @param {String} [spId=null] 保留使用
+     * @param {Array} [cards=null] 卡号列表，支付控件2.0.14新增的参数，必须传正确的卡号，否则支付控件无法启动。
      * @platform Android, iOS
      * @since 3.0.0
      */
-    startPay: function(successCallback, errorCallback, transSerialNumber, mode, sysProvide, spId) {
-        argscheck.checkArgs('ffssSS', 'UPPay.startPay', arguments);
+    startPay: function(successCallback, errorCallback, transSerialNumber, mode, sysProvide, spId, cards) {
+        argscheck.checkArgs('ffssSSA', 'UPPay.startPay', arguments);
         if(typeof transSerialNumber === "undefined" || typeof mode === "undefined" || 
             transSerialNumber === null || mode === null) {
             errorCallback("Argument transSerialNumber and mode must be not empty!");
@@ -73,15 +75,40 @@ var uppay = {
         mode = mode.toString();
         sysProvide = sysProvide || null;
         spId = spId || null;
-        exec(successCallback, errorCallback, "UPPay", "startPay", [transSerialNumber, mode, sysProvide, spId]);
+        cards = cards || null;
+        exec(successCallback, errorCallback, "UPPay", "startPay", [transSerialNumber, mode, sysProvide, spId, cards]);
     },
+
     /**
-    * 返回交易结果回调 (Android, iOS)
-    * 该方法在交易结束后被调用，如果app覆盖该函数，则执行app定义的回调，否则什么都不做。
-    * @method startPay
-    * @param result{String}          返回的交易结果：success，fail 或 cancel
-    */
-    onPayResult : function (result) {
+     * 启动无卡余额查询(Android, iOS)
+     * @example
+        var uppaySuccess = function(result) {
+            alert("start success!");
+            document.getElementById('balance').innerText = result.balance;
+            document.getElementById('availableBalance').innerText = result.availableBalance;
+        };
+
+        var uppayError = function(info) {
+            alert("start error: " + info);
+        };
+
+        UPPay.startBalanceEnquire(this.uppaySuccess, this.uppayError, '6228671****45767', '01');
+     * @method startBalanceEnquire
+     * @param {Function} successCallback 成功回调函数
+     * @param {String} successCallback.balance 余额
+     * @param {String} successCallback.availableBalance 可用余额
+     * @param {Function} errorCallback 失败回调函数
+     * @param {String} errorCallback.info 值为"false"
+     * @param {String} pan 银行卡号，必须全卡号
+     * @param {String} mode 接入模式，取值说明<br/>
+                "00"：代表接入生产环境（正式版本需要）<br/>
+                "01"：代表接入开发测试环境（测试版本需要）<br/>
+     * @platform Android, iOS
+     * @since 3.0.0
+     */
+    startBalanceEnquire: function(successCallback, errorCallback, pan, mode) {
+        argscheck.checkArgs('ffss', 'UPPay.startBalanceEnquire', arguments);
+        exec(successCallback, errorCallback, "UPPay", "startBalanceEnquire", [pan, mode]);
     }
 };
 module.exports = uppay;

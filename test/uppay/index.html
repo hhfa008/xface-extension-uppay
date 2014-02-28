@@ -81,21 +81,28 @@
 
     function startPay(){
         updateProcess("startPaying");
-        UPPay.startPay(paySuccess, payFail, tn, "01", null, null);
-        UPPay.onPayResult = function(result)
-        {
-            updateStatus("pay succeeded");
-            updateProcess("test over");
-        }
+        var mycards = new Array();
+        mycards[0] = "6228671011425767";
+        UPPay.startPay(paySuccess, payFail, tn, "01", null, null, mycards);
     }
 
-    function paySuccess() {
-       updateStatus("startPay succeeded");
-       updateProcess("waiting for pay result");
+    function startBalanceEnquire() {
+        updateProcess("startBalanceEnquire");
+        UPPay.startBalanceEnquire(startSuccess, payFail, '6228671011425767', '01');
+    }
+
+    function startSuccess(result) {
+       updateStatus("succeeded");
+       updateProcess("test over " + "balance: " + result.balance + ";Available balance: " + result.availableBalance);
+    }
+
+    function paySuccess(info) {
+       updateStatus("succeeded");
+       updateProcess("test over " + info);
     }
 
     function payFail(error) {
-        updateStatus("startPay failed [" + error + "]");
+        updateStatus("failed [" + error + "]");
         updateProcess("test over");
     }
 </script>
@@ -106,9 +113,11 @@
     <h1>UPPay </h1>
     <div id="descr">
         测试说明: <br/>
-        测试目的：测试银联支付控件<br/>
+        1.测试目的：测试银联支付控件<br/>
         测试通过条件：银联支付控件正常启动，交易结束后正常显示交易结果<br/>
-        注意：测试前请确认android手机已安装银联支付控件,安装包可在test/uppay/目录下获取到<br/>
+        注意：测试前请确认android手机已安装银联支付控件,安装包可在spectest/nscb/uppaytest/目录下获取到<br/>
+        2.测试目的：测试无卡余额查询接口<br/>
+        测试通过条件：无卡余额查询控件正常启动，密码111101，查询后，退出控件，有返回结果<br/>
     </div>
     <div id="info">
         process: <span id="process"></span><br/>
@@ -116,6 +125,7 @@
     </div>
     <h2>Action</h2>
     <div class="btn large" onclick="testPay();">startPay</div>
+    <div class="btn large" onclick="startBalanceEnquire();">startBalanceEnquire</div>
     <h2> </h2><div class="backBtn" onclick="backHome();">Back</div>
   </body>
 </html>
