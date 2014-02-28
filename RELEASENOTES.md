@@ -27,3 +27,9 @@
  *  batch modify .reviewboard
  *  #2: Added UIViewControllerBasedStatusBarAppearance key and false value to info.plist to hide status bar when displaying payment page.
  *  Incremented plugin version on dev branch to 1.0.1-dev
+
+## 1.0.2 (Fri Feb 28 2014)
+
+
+ *  [Android]Synchconize uppay
+ *  Incremented plugin version on dev branch to 1.0.2-dev
