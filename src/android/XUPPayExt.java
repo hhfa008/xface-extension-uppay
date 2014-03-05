@@ -24,9 +24,7 @@ package com.polyvi.xface.extension.uppay;
 import java.util.Locale;
 
 import org.apache.cordova.CallbackContext;
-import org.apache.cordova.CordovaInterface;
 import org.apache.cordova.CordovaPlugin;
-import org.apache.cordova.CordovaWebView;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -79,12 +77,6 @@ public class XUPPayExt extends CordovaPlugin {
     private CallbackContext mCallbackCtx;
 
     @Override
-    public void initialize(CordovaInterface cordova, CordovaWebView webView) {
-        cordova.setActivityResultCallback(this);
-        super.initialize(cordova, webView);
-    }
-
-    @Override
     public boolean execute(String action, JSONArray args,
             CallbackContext callbackContext) throws JSONException {
         // 目前不支持同时进行多个支付操作
@@ -101,6 +93,7 @@ public class XUPPayExt extends CordovaPlugin {
             }
             // 保留域
             String reserved = null;
+            cordova.setActivityResultCallback(this);
             UPLauncher.startUPPay(cordova.getActivity(),
                     transSerialNumber, cards, mode, reserved);
         } else if (COMMAND_START_BALANCE_ENQUIRE.equals(action)) {
@@ -110,6 +103,7 @@ public class XUPPayExt extends CordovaPlugin {
             String mode = args.getString(1);
             // 保留域
             String reserved = null;
+            cordova.setActivityResultCallback(this);
             UPLauncherV2.startBalanceEnquire(cordova.getActivity(), pan,
                     mode, reserved);
         } else {
@@ -157,6 +151,5 @@ public class XUPPayExt extends CordovaPlugin {
                 }
             }
         }
-        mCallbackCtx.error(payResult);
     }
 }
