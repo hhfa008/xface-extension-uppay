@@ -21,13 +21,14 @@
 
 #import <Cordova/CDVPlugin.h>
 #import "UPPayPlugin.h"
+#import "UPBalanceQueryPlugin.h"
 
 @class XUPPayExt;
 
 /**
   用于处理支付结果信息，并回传给js页面
  */
-@interface XUPPayDelegate : NSObject<UPPayPluginDelegate>
+@interface XUPPayDelegate : NSObject<UPPayPluginDelegate, UPBalanceQueryDelegate>
 {
     NSString* _callbackId;
 }
@@ -58,6 +59,14 @@
     - 3 NSString *spId 保留使用
  */
 - (void)startPay:(CDVInvokedUrlCommand*)command;
+
+/**
+  启动余额查询控件
+  @param arguments
+    - 0 NSString *pan 银行卡号
+    - 1 NSString *mode "00"：代表接入生产环境（正式版本需要），"01"：代表接入开发测试环境（测试版本需要）
+ */
+- (void)startBalanceEnquire:(CDVInvokedUrlCommand*)command;
 
 /**
   从注册的delegate集合中删除指定的对象
