@@ -24,11 +24,17 @@
             <false/>
         </config-file>
 
-        <header-file src="src/ios/UPPayPlugin.h" />
-        <header-file src="src/ios/UPPayPluginDelegate.h" />
         <header-file src="src/ios/XUPPayExt.h" />
         <source-file src="src/ios/XUPPayExt.m" />
-        <source-file framework="true" src="src/ios/libUPPayPlugin.a" />
+
+        <header-file src="src/ios/UPPayPluginEx-SND-2.0.14/UPPayPlugin.h" />
+        <header-file src="src/ios/UPPayPluginEx-SND-2.0.14/UPPayPluginDelegate.h" />
+        <source-file framework="true" src="src/ios/UPPayPluginEx-SND-2.0.14/libUPPayPlugin.a" />
+
+        <header-file src="src/ios/UPPayPluginEx-SND-2.0.16/UPBalanceQueryPlugin.h" />
+        <header-file src="src/ios/UPPayPluginEx-SND-2.0.16/UPBalanceQueryDelegate.h" />
+        <source-file framework="true" src="src/ios/UPPayPluginEx-SND-2.0.16/libUPBalanceQueryPlugin.a" />
+
         <framework src="QuartzCore.framework" />
         <framework src="libstdc++.dylib" />
     </platform>

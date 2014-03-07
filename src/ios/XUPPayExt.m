@@ -37,8 +37,11 @@
 }
 
 // result may be "success", "fail" or "cancel"
-- (void)UPPayPluginResult:(NSString*)result
+- (void)UPPayPluginResult:(NSString *)result
 {
+    CDVCommandStatus status = [result isEqualToString:@"success"] ? CDVCommandStatus_OK : CDVCommandStatus_ERROR;
+    CDVPluginResult *extResult = [CDVPluginResult resultWithStatus:status messageAsString:result];
+    [self.uppayExt.commandDelegate sendPluginResult:extResult callbackId:self->_callbackId];
 
     if(IsAtLeastiOSVersion(@"7.0"))
     {
@@ -46,8 +49,37 @@
         [[UIApplication sharedApplication] setStatusBarHidden:self.statusBarHidden];
     }
 
-    NSString* jsScript = [NSString stringWithFormat:@"UPPay.onPayResult('%@');", result];
-    [self.uppayExt.commandDelegate evalJs:jsScript];
+    [self.uppayExt removeUPPayDelegate:self];
+    self.uppayExt = nil;
+}
+
+/**
+    @成功调用控件以后，会执行回调函数。该函数返回一个字典，下面是关键字的意义：
+
+    @key:result                value：(success,fail,cancel)
+    @key:balance               value：账面余额（仅在成功时返回，其余为nil）
+    @key:availableBalance      value：可用余额（仅在成功时返回，其余为nil）
+
+ */
+- (void)balanceQueryResult:(NSDictionary *)resultDict
+{
+    CDVPluginResult *extResult;
+    NSString* result = [resultDict objectForKey:@"result"];
+    if([result isEqualToString:@"success"])
+    {
+        extResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:resultDict];
+    }
+    else
+    {
+        extResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR];
+    }
+    [self.uppayExt.commandDelegate sendPluginResult:extResult callbackId:self->_callbackId];
+
+    if(IsAtLeastiOSVersion(@"7.0"))
+    {
+        //在iOS 7.0上，还原status bar显示状态
+        [[UIApplication sharedApplication] setStatusBarHidden:self.statusBarHidden];
+    }
     [self.uppayExt removeUPPayDelegate:self];
     self.uppayExt = nil;
 }
@@ -56,7 +88,7 @@
 
 @implementation XUPPayExt
 
-- (CDVPlugin*)initWithWebView:(UIWebView*)theWebView
+- (CDVPlugin*)initWithWebView:(UIWebView *)theWebView
 {
     self = [super initWithWebView:theWebView];
     if (self)
@@ -67,13 +99,14 @@
     return self;
 }
 
-- (void)startPay:(CDVInvokedUrlCommand*)command
+- (void)startPay:(CDVInvokedUrlCommand *)command
 {
     NSString *transSerialNumber = [command.arguments objectAtIndex:0];
     //"00" for formal environment, "01" for test environment
     NSString *mode = [command.arguments objectAtIndex:1];
     NSString *sysProvide = [command.arguments objectAtIndex:2];
     NSString *spId = [command.arguments objectAtIndex:3];
+    NSArray *cards = [command argumentAtIndex:4 withDefault:[NSArray array]];
     XUPPayDelegate *delegate = [[XUPPayDelegate alloc] initWithCallbackId:command.callbackId];
 
     delegate.statusBarHidden = [UIApplication sharedApplication].statusBarHidden;
@@ -83,21 +116,47 @@
         [[UIApplication sharedApplication] setStatusBarHidden:YES];
     }
 
+    if ([UPPayPlugin respondsToSelector:@selector(startPay:sysProvide:spId:mode:viewController:delegate:)])
+    {
+        [UPPayPlugin startPay:transSerialNumber sysProvide:sysProvide spId:spId mode:mode viewController:[self viewController] delegate:delegate];
+    }
+    else if ([UPPayPlugin respondsToSelector:@selector(startPay:mode:viewController:delegate:)])
+    {
+        [UPPayPlugin startPay:transSerialNumber mode:mode viewController:[self viewController] delegate:delegate];
+    }
+    else if ([UPPayPlugin respondsToSelector:@selector(startPay:mode:viewController:delegate:cards:)])
+    {
+        [UPPayPlugin startPay:transSerialNumber mode:mode viewController:[self viewController] delegate:delegate cards:cards];
+    }
+
     [uppayDelegates addObject:delegate];
     delegate.uppayExt = self;
+}
 
-    BOOL ret;
-    if([UPPayPlugin respondsToSelector:@selector(startPay:sysProvide:spId:mode:viewController:delegate:)])
+- (void)startBalanceEnquire:(CDVInvokedUrlCommand *)command
+{
+    NSString *pan = [command.arguments objectAtIndex:0];
+    //"00" for formal environment, "01" for test environment
+    NSString *mode = [command.arguments objectAtIndex:1];
+    XUPPayDelegate *delegate = [[XUPPayDelegate alloc] initWithCallbackId:command.callbackId];
+
+    delegate.statusBarHidden = [UIApplication sharedApplication].statusBarHidden;
+    if(IsAtLeastiOSVersion(@"7.0"))
     {
-       ret = [UPPayPlugin startPay:transSerialNumber sysProvide:sysProvide spId:spId mode:mode viewController:[self viewController] delegate:delegate];
+        // iOS 7.0上，使用全屏方式启动支付控件，解决状态栏与支付控件内容发生重叠的问题
+        [[UIApplication sharedApplication] setStatusBarHidden:YES];
     }
-    else
-    {
-       ret = [UPPayPlugin startPay:transSerialNumber mode:mode viewController:[self viewController] delegate:delegate];
+
+    BOOL ret = [UPBalanceQueryPlugin startQueryBalanceWithPan:pan  mode:mode container:[self viewController] delegate:delegate];
+
+    if (!ret) {
+        CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR];
+        [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+        return;
     }
-    CDVCommandStatus status = ret ? CDVCommandStatus_OK : CDVCommandStatus_ERROR;
-    CDVPluginResult* result = [CDVPluginResult resultWithStatus:status];
-    [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+
+    [uppayDelegates addObject:delegate];
+    delegate.uppayExt = self;
 }
 
 - (void) removeUPPayDelegate:(XUPPayDelegate *)delegate
