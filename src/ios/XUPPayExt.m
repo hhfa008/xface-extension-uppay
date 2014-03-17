@@ -36,11 +36,19 @@
     return self;
 }
 
-// result may be "success", "fail" or "cancel"
 - (void)UPPayPluginResult:(NSString *)result
 {
-    CDVCommandStatus status = [result isEqualToString:@"success"] ? CDVCommandStatus_OK : CDVCommandStatus_ERROR;
-    CDVPluginResult *extResult = [CDVPluginResult resultWithStatus:status messageAsString:result];
+    /** result:
+        支付成功：银行卡卡号
+        支付失败：fail
+        支付取消：cancel
+     */
+    CDVPluginResult *extResult;
+    if([result isEqualToString:@"fail"] || [result isEqualToString:@"cancel"]){
+        extResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:result];
+    } else {
+        extResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"success"];
+    }
     [self.uppayExt.commandDelegate sendPluginResult:extResult callbackId:self->_callbackId];
 
     if(IsAtLeastiOSVersion(@"7.0"))
