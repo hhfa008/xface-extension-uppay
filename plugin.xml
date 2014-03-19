@@ -3,7 +3,7 @@
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
     xmlns:android="http://schemas.android.com/apk/res/android"
     id="com.polyvi.xface.extension.uppay"
-    version="1.0.3-dev">
+    version="1.0.3">
     <name>UPPay</name>
     <description>xFace UPPay Extension</description>
     <license>GPLv3</license>

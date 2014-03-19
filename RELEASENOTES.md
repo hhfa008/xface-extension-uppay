@@ -33,3 +33,14 @@
 
  *  [Android]Synchconize uppay
  *  Incremented plugin version on dev branch to 1.0.2-dev
+
+
+## 1.0.3 (Wed Mar 19 2014)
+
+
+ *  [iOS] Update the callback result according to UPPay documentation.
+ *  issue 3 UPPay-->startBalanceEnquire: enquiry failed when tester input 111101 in balance enquire plugin. Bug reason:test page description has not updated. Solution:updated description in test page
+ *  [iOS]issue 2: Sync p4 change 18219 & 18337 and implement startBalanceEnquire:
+ *  [iOS] Add 2.0.14-libUPPayPlugin and 2.0.16-libUPBalanceQueryPlugin
+ *  [Android]Fix crash when mCallbackCtx is null
+ *  Incremented plugin version on dev branch to 1.0.3-dev
