@@ -56,3 +56,10 @@
  *  [iOS] Add 2.0.14-libUPPayPlugin and 2.0.16-libUPBalanceQueryPlugin
  *  [Android]Fix crash when mCallbackCtx is null
  *  Incremented plugin version on dev branch to 1.0.3-dev
+
+
+## 1.0.4 (Thu Apr 03 2014)
+
+
+ *  [Android]Update libs file to fix enquire balance failed on production platform
+ *  Incremented plugin version on dev branch to 1.0.4-dev
